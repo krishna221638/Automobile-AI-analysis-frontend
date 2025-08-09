@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
-import {
-  Car,
-  BarChart3,
-  Search,
-  AlertCircle,
-  CheckCircle,
-  Loader2,
-} from "lucide-react";
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { Toaster, toast } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   apiService,
   type DatasetInfo,
   type AnalysisResult,
   type ExampleQuery,
 } from "./services/api";
-import ChartDisplay from "./components/ChartDisplay";
+import Navbar from "./components/Navbar";
+import ModernChartDisplay from "./components/ModernChartDisplay";
+import ModernQueryInput from "./components/ModernQueryInput";
+import LoadingSkeleton from "./components/LoadingSkeleton";
+import QueryHistory from "./components/QueryHistory";
 import DatasetPreview from "./components/DatasetPreview";
 import ExampleQueries from "./components/ExampleQueries";
-import QueryInput from "./components/QueryInput";
+import { useQueryHistory } from "./hooks/useQueryHistory";
+import { useTheme } from "./hooks/useTheme";
 
 interface AppState {
   isInitialized: boolean;
@@ -30,6 +30,10 @@ interface AppState {
 }
 
 function App() {
+  useTheme(); // Initialize theme
+  const { history, activeQuery, addQuery, selectQuery, clearHistory } = useQueryHistory();
+  const [showHistory, setShowHistory] = useState(false);
+  
   const [state, setState] = useState<AppState>({
     isInitialized: false,
     isLoading: false,
@@ -79,9 +83,9 @@ function App() {
       setState((prev) => ({
         ...prev,
         isLoading: false,
-        error:
-          error instanceof Error ? error.message : "Unknown error occurred",
+        error: error instanceof Error ? error.message : "Unknown error occurred",
       }));
+      toast.error("Failed to initialize application");
     }
   };
 
@@ -98,17 +102,26 @@ function App() {
 
     try {
       const result = await apiService.analyzeQuery(query, library);
+      
       setState((prev) => ({
         ...prev,
         isAnalyzing: false,
         analysisResult: result,
       }));
+      
+      if (result.success) {
+        addQuery(query, result);
+        toast.success("Analysis completed successfully!");
+      } else {
+        toast.error(result.error || "Analysis failed");
+      }
     } catch (error) {
       setState((prev) => ({
         ...prev,
         isAnalyzing: false,
         error: error instanceof Error ? error.message : "Analysis failed",
       }));
+      toast.error("Analysis failed");
     }
   };
 
@@ -133,20 +146,29 @@ function App() {
       }
     } catch (error) {
       console.error("Download failed:", error);
+      toast.error("Download failed");
     }
   };
 
+  const displayResult = activeQuery?.result || state.analysisResult;
+
   if (state.isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Initializing Application
-          </h2>
-          <p className="text-gray-600">
-            Loading automobile dataset and connecting to Mistral AI...
-          </p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+        <div className="min-h-screen flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Initializing Application
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading automobile dataset and connecting to Mistral AI...
+            </p>
+          </motion.div>
         </div>
       </div>
     );
@@ -154,79 +176,103 @@ function App() {
 
   if (state.error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Initialization Failed
-          </h2>
-          <p className="text-gray-600 mb-4">{state.error}</p>
-          <button
-            onClick={initializeApp}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+        <div className="min-h-screen flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center max-w-md"
           >
-            Retry
-          </button>
+            <AlertCircle className="h-12 w-12 text-red-600 dark:text-red-400 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Initialization Failed
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{state.error}</p>
+            <motion.button
+              onClick={initializeApp}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Retry
+            </motion.button>
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center space-x-3">
-            <Car className="h-8 w-8 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">
-              Automobile Data Analysis with Mistral AI
-            </h1>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          className: 'dark:bg-gray-800 dark:text-white',
+        }}
+      />
+      
+      <Navbar 
+        onToggleHistory={() => setShowHistory(!showHistory)}
+        onClearHistory={clearHistory}
+        historyCount={history.length}
+      />
+      
+      <QueryHistory
+        isOpen={showHistory}
+        onClose={() => setShowHistory(false)}
+        history={history}
+        activeQueryId={activeQuery?.id || null}
+        onSelectQuery={selectQuery}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="grid grid-cols-1 lg:grid-cols-4 gap-8"
+        >
           {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-1 space-y-6"
+          >
             {/* Dataset Info */}
             {state.datasetInfo && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <BarChart3 className="h-5 w-5 mr-2" />
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Dataset Info
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <span className="text-sm font-medium text-gray-500">
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       Rows:
                     </span>
-                    <span className="ml-2 text-sm text-gray-900">
+                    <span className="ml-2 text-sm text-gray-900 dark:text-white">
                       {state.datasetInfo.rows}
                     </span>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       Columns:
                     </span>
-                    <span className="ml-2 text-sm text-gray-900">
+                    <span className="ml-2 text-sm text-gray-900 dark:text-white">
                       {state.datasetInfo.columns}
                     </span>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       Numeric:
                     </span>
-                    <span className="ml-2 text-sm text-gray-900">
+                    <span className="ml-2 text-sm text-gray-900 dark:text-white">
                       {state.datasetInfo.numeric_columns.length}
                     </span>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       Categorical:
                     </span>
-                    <span className="ml-2 text-sm text-gray-900">
+                    <span className="ml-2 text-sm text-gray-900 dark:text-white">
                       {state.datasetInfo.categorical_columns.length}
                     </span>
                   </div>
@@ -249,26 +295,127 @@ function App() {
             {state.datasetPreview.length > 0 && (
               <DatasetPreview data={state.datasetPreview.slice(0, 5)} />
             )}
-          </div>
+          </motion.div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-3 space-y-6"
+          >
             {/* Query Input */}
-            <QueryInput
+            <ModernQueryInput
               onAnalyze={handleAnalyzeQuery}
               isAnalyzing={state.isAnalyzing}
             />
 
             {/* Analysis Results */}
-            {state.analysisResult && (
-              <div className="space-y-6">
-                {/* Success Message */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                    <p className="text-green-800 font-medium">
-                      Analysis completed successfully!
-                    </p>
+            <AnimatePresence mode="wait">
+              {state.isAnalyzing ? (
+                <LoadingSkeleton key="loading" />
+              ) : displayResult ? (
+                <motion.div
+                  key="results"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-6"
+                >
+                  {/* Success Message */}
+                  {displayResult.success && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4"
+                    >
+                      <div className="flex items-center">
+                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mr-2" />
+                        <p className="text-green-800 dark:text-green-200 font-medium">
+                          Analysis completed successfully!
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Chart Specifications */}
+                  {displayResult.success && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors"
+                    >
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        Chart Specifications
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Chart Type:
+                          </span>
+                          <p className="text-sm text-gray-900 dark:text-white font-mono">
+                            {displayResult.analysis.chart}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            X-Axis:
+                          </span>
+                          <p className="text-sm text-gray-900 dark:text-white font-mono">
+                            {displayResult.analysis.x}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Y-Axis:
+                          </span>
+                          <p className="text-sm text-gray-900 dark:text-white font-mono">
+                            {displayResult.analysis.y || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            Aggregation:
+                          </span>
+                          <p className="text-sm text-gray-900 dark:text-white font-mono">
+                            {displayResult.analysis.agg || "None"}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Chart Display */}
+                  <ModernChartDisplay
+                    result={displayResult}
+                    onDownload={handleDownloadData}
+                  />
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+
+            {/* Analysis Error */}
+            {state.error && state.isInitialized && !state.isAnalyzing && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4"
+              >
+                <div className="flex items-center">
+                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mr-2" />
+                  <p className="text-red-800 dark:text-red-200">{state.error}</p>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
                   </div>
                 </div>
 
