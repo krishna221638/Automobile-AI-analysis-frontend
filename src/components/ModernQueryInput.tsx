@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Send, Settings, Sparkles } from 'lucide-react';
+import { Search, Send, Settings, Sparkles, Zap, Brain } from 'lucide-react';
 
 interface ModernQueryInputProps {
   onAnalyze: (query: string, library: 'plotly' | 'matplotlib') => void;
@@ -28,101 +28,148 @@ const ModernQueryInput: React.FC<ModernQueryInputProps> = ({ onAnalyze, isAnalyz
   };
 
   const exampleQueries = [
-    'Show average price by brand',
-    'Plot horsepower vs price',
-    'Display price distribution histogram',
-    'Compare fuel efficiency by fuel type',
+    { text: 'Show average price by brand', icon: '📊', color: 'from-blue-400 to-purple-500' },
+    { text: 'Plot horsepower vs price', icon: '⚡', color: 'from-green-400 to-blue-500' },
+    { text: 'Display price distribution histogram', icon: '📈', color: 'from-purple-400 to-pink-500' },
+    { text: 'Compare fuel efficiency by fuel type', icon: '⛽', color: 'from-orange-400 to-red-500' },
   ];
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors"
+      className="glass rounded-2xl shadow-2xl p-8 border border-white/20 backdrop-blur-xl"
     >
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-        <Sparkles className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400" />
-        Natural Language Query
-      </h2>
+      <motion.div 
+        className="flex items-center mb-6"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="relative">
+          <Brain className="h-8 w-8 text-white mr-3" />
+          <div className="absolute inset-0 h-8 w-8 bg-gradient-to-r from-primary-400 to-accent-400 rounded-full blur-lg opacity-50 animate-pulse"></div>
+        </div>
+        <h2 className="text-2xl font-bold text-white">
+          AI-Powered Data Analysis
+        </h2>
+        <Sparkles className="h-6 w-6 text-yellow-300 ml-2 animate-bounce" />
+      </motion.div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
           <label
             htmlFor="query"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="block text-lg font-semibold text-white mb-3 flex items-center"
           >
-            Enter your analysis request:
+            <Search className="h-5 w-5 mr-2" />
+            What would you like to discover?
           </label>
-          <textarea
-            id="query"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="e.g., show average price by brand"
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
-            rows={3}
-            disabled={isAnalyzing}
-          />
-        </div>
+          <div className="relative">
+            <textarea
+              id="query"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Ask me anything about the automobile data... e.g., 'show average price by brand'"
+              className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-2xl focus:ring-4 focus:ring-primary-500/50 focus:border-primary-400 resize-none text-white placeholder-white/60 text-lg transition-all duration-300 shadow-lg"
+              rows={3}
+              disabled={isAnalyzing}
+            />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary-500/20 to-accent-500/20 pointer-events-none opacity-0 transition-opacity duration-300 peer-focus:opacity-100"></div>
+          </div>
+        </motion.div>
 
-        <div className="flex items-center justify-between">
+        <motion.div 
+          className="flex items-center justify-between"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Settings className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Chart Library:
+            <div className="flex items-center space-x-3">
+              <Settings className="h-5 w-5 text-white/80" />
+              <label className="text-lg font-medium text-white">
+                Visualization Engine:
               </label>
             </div>
-            <select
-              value={library}
-              onChange={(e) => setLibrary(e.target.value as 'plotly' | 'matplotlib')}
-              className="border border-gray-300 dark:border-gray-600 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-              disabled={isAnalyzing}
-            >
-              <option value="plotly">Plotly</option>
-              <option value="matplotlib">Matplotlib</option>
-            </select>
+            <div className="relative">
+              <select
+                value={library}
+                onChange={(e) => setLibrary(e.target.value as 'plotly' | 'matplotlib')}
+                className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-xl px-4 py-2 text-white focus:ring-4 focus:ring-primary-500/50 focus:border-primary-400 transition-all duration-300 appearance-none cursor-pointer"
+                disabled={isAnalyzing}
+              >
+                <option value="plotly" className="bg-gray-800 text-white">Interactive (Plotly)</option>
+                <option value="matplotlib" className="bg-gray-800 text-white">Static (Matplotlib)</option>
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
 
           <motion.button
             type="submit"
             disabled={!query.trim() || isAnalyzing}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all flex items-center space-x-2 shadow-lg"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white px-8 py-3 rounded-xl disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed transition-all duration-300 flex items-center space-x-3 shadow-2xl font-semibold text-lg"
           >
             {isAnalyzing ? (
               <>
-                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                 <span>Analyzing...</span>
               </>
             ) : (
               <>
-                <Send className="h-4 w-4" />
+                <Zap className="h-5 w-5" />
                 <span>Analyze</span>
               </>
             )}
           </motion.button>
-        </div>
+        </motion.div>
       </form>
 
-      <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors">
-        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-          Quick Examples:
+      <motion.div 
+        className="mt-8 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        <p className="text-lg font-semibold text-white mb-4 flex items-center">
+          <Sparkles className="h-5 w-5 mr-2 text-yellow-300" />
+          Quick Start Examples:
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {exampleQueries.map((example, index) => (
             <motion.button
               key={index}
-              onClick={() => setQuery(example)}
-              whileHover={{ scale: 1.02 }}
+              onClick={() => setQuery(example.text)}
+              whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="text-xs bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-500 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 + index * 0.1 }}
+              className={`text-left p-4 rounded-xl bg-gradient-to-r ${example.color} bg-opacity-20 backdrop-blur-sm border border-white/20 hover:border-white/40 transition-all duration-300 group shadow-lg`}
             >
-              {example}
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl group-hover:scale-110 transition-transform duration-300">
+                  {example.icon}
+                </span>
+                <span className="text-white font-medium group-hover:text-white transition-colors duration-300">
+                  {example.text}
+                </span>
+              </div>
             </motion.button>
           ))}
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
