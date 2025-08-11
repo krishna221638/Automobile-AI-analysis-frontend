@@ -35,6 +35,9 @@ interface ModernChartDisplayProps {
 
 const ModernChartDisplay: React.FC<ModernChartDisplayProps> = ({ result, onDownload }) => {
   const chartRef = useRef<any>(null);
+  
+  // Get current theme
+  const isDark = document.documentElement.classList.contains('dark');
 
   if (!result.success) {
     return (
@@ -70,30 +73,30 @@ const ModernChartDisplay: React.FC<ModernChartDisplayProps> = ({ result, onDownl
       legend: {
         position: 'top' as const,
         labels: {
-          color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+          color: isDark ? '#e5e7eb' : '#374151',
         },
       },
       title: {
         display: true,
         text: `${result.analysis.chart.charAt(0).toUpperCase() + result.analysis.chart.slice(1)} Chart`,
-        color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#374151',
+        color: isDark ? '#e5e7eb' : '#374151',
       },
     },
     scales: {
       x: {
         ticks: {
-          color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280',
+          color: isDark ? '#9ca3af' : '#6b7280',
         },
         grid: {
-          color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+          color: isDark ? '#374151' : '#e5e7eb',
         },
       },
       y: {
         ticks: {
-          color: document.documentElement.classList.contains('dark') ? '#9ca3af' : '#6b7280',
+          color: isDark ? '#9ca3af' : '#6b7280',
         },
         grid: {
-          color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb',
+          color: isDark ? '#374151' : '#e5e7eb',
         },
       },
     },
@@ -112,28 +115,59 @@ const ModernChartDisplay: React.FC<ModernChartDisplayProps> = ({ result, onDownl
     }
 
     // Chart.js compatible data
-    const chartData = {
-      labels: result.chart_data.data[0]?.x || [],
-      datasets: result.chart_data.data.map((dataset: any, index: number) => ({
-        label: dataset.name || `Dataset ${index + 1}`,
-        data: dataset.y || dataset.data || [],
-        backgroundColor: [
-          'rgba(59, 130, 246, 0.8)',
-          'rgba(16, 185, 129, 0.8)',
-          'rgba(245, 158, 11, 0.8)',
-          'rgba(239, 68, 68, 0.8)',
-          'rgba(139, 92, 246, 0.8)',
-        ],
-        borderColor: [
-          'rgba(59, 130, 246, 1)',
-          'rgba(16, 185, 129, 1)',
-          'rgba(245, 158, 11, 1)',
-          'rgba(239, 68, 68, 1)',
-          'rgba(139, 92, 246, 1)',
-        ],
-        borderWidth: 2,
-      })),
-    };
+    let chartData;
+    
+    try {
+      // Handle different data structures from backend
+      if (result.chart_data?.data && Array.isArray(result.chart_data.data)) {
+        chartData = {
+          labels: result.chart_data.data[0]?.x || [],
+          datasets: result.chart_data.data.map((dataset: any, index: number) => ({
+            label: dataset.name || `Dataset ${index + 1}`,
+            data: dataset.y || dataset.data || [],
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.8)',
+              'rgba(16, 185, 129, 0.8)',
+              'rgba(245, 158, 11, 0.8)',
+              'rgba(239, 68, 68, 0.8)',
+              'rgba(139, 92, 246, 0.8)',
+            ],
+            borderColor: [
+              'rgba(59, 130, 246, 1)',
+              'rgba(16, 185, 129, 1)',
+              'rgba(245, 158, 11, 1)',
+              'rgba(239, 68, 68, 1)',
+              'rgba(139, 92, 246, 1)',
+            ],
+            borderWidth: 2,
+          })),
+        };
+      } else {
+        // Fallback for different data structure
+        chartData = {
+          labels: ['No Data'],
+          datasets: [{
+            label: 'No Data Available',
+            data: [0],
+            backgroundColor: 'rgba(156, 163, 175, 0.8)',
+            borderColor: 'rgba(156, 163, 175, 1)',
+            borderWidth: 2,
+          }],
+        };
+      }
+    } catch (error) {
+      console.error('Error processing chart data:', error);
+      chartData = {
+        labels: ['Error'],
+        datasets: [{
+          label: 'Data Processing Error',
+          data: [0],
+          backgroundColor: 'rgba(239, 68, 68, 0.8)',
+          borderColor: 'rgba(239, 68, 68, 1)',
+          borderWidth: 2,
+        }],
+      };
+    }
 
     switch (result.analysis.chart.toLowerCase()) {
       case 'bar':
@@ -224,7 +258,7 @@ const ModernChartDisplay: React.FC<ModernChartDisplayProps> = ({ result, onDownl
             <table className="min-w-full text-xs">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
-                  {Object.keys(result.processed_data[0] || {}).map((key) => (
+                  {result.processed_data && result.processed_data.length > 0 && Object.keys(result.processed_data[0]).map((key) => (
                     <th
                       key={key}
                       className="text-left py-2 px-1 font-medium text-gray-700 dark:text-gray-300"
@@ -235,7 +269,7 @@ const ModernChartDisplay: React.FC<ModernChartDisplayProps> = ({ result, onDownl
                 </tr>
               </thead>
               <tbody>
-                {result.processed_data.slice(0, 10).map((row, index) => (
+                {result.processed_data && result.processed_data.slice(0, 10).map((row, index) => (
                   <tr key={index} className="border-b border-gray-100 dark:border-gray-700">
                     {Object.values(row).map((value, cellIndex) => (
                       <td key={cellIndex} className="py-1 px-1 text-gray-600 dark:text-gray-400">
@@ -249,9 +283,15 @@ const ModernChartDisplay: React.FC<ModernChartDisplayProps> = ({ result, onDownl
               </tbody>
             </table>
 
-            {result.processed_data.length > 10 && (
+            {result.processed_data && result.processed_data.length > 10 && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 Showing 10 of {result.processed_data.length} rows
+              </p>
+            )}
+            
+            {(!result.processed_data || result.processed_data.length === 0) && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center py-4">
+                No processed data available
               </p>
             )}
           </div>

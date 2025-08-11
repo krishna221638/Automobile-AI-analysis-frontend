@@ -126,7 +126,7 @@ function App() {
   };
 
   const handleDownloadData = async () => {
-    if (!state.analysisResult?.processed_data) return;
+    if (!state.analysisResult?.processed_data || !Array.isArray(state.analysisResult.processed_data)) return;
 
     try {
       const result = await apiService.downloadData(

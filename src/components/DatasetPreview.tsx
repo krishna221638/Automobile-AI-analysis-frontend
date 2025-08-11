@@ -6,11 +6,11 @@ interface DatasetPreviewProps {
 }
 
 const DatasetPreview: React.FC<DatasetPreviewProps> = ({ data }) => {
-  if (!data || data.length === 0) {
+  if (!data || !Array.isArray(data) || data.length === 0) {
     return null;
   }
 
-  const columns = Object.keys(data[0]);
+  const columns = data[0] ? Object.keys(data[0]) : [];
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors">
