@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AlertCircle, CheckCircle, Loader2, Sparkles, Zap } from "lucide-react";
-import { Toaster, toast } from 'react-hot-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Toaster, toast } from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   apiService,
   type DatasetInfo,
@@ -17,6 +17,8 @@ import DatasetPreview from "./components/DatasetPreview";
 import ExampleQueries from "./components/ExampleQueries";
 import { useQueryHistory } from "./hooks/useQueryHistory";
 import { useTheme } from "./hooks/useTheme";
+import ErrorBoundary from "./components/ErrorBoundary";
+import ConnectionTest from "./components/ConnectionTest";
 
 interface AppState {
   isInitialized: boolean;
@@ -31,9 +33,10 @@ interface AppState {
 
 function App() {
   useTheme(); // Initialize theme
-  const { history, activeQuery, addQuery, selectQuery, clearHistory } = useQueryHistory();
+  const { history, activeQuery, addQuery, selectQuery, clearHistory } =
+    useQueryHistory();
   const [showHistory, setShowHistory] = useState(false);
-  
+
   const [state, setState] = useState<AppState>({
     isInitialized: false,
     isLoading: false,
@@ -82,22 +85,23 @@ function App() {
 
       toast.success("🚀 Ready to analyze your data!", {
         style: {
-          background: 'rgba(34, 197, 94, 0.9)',
-          color: 'white',
-          backdropFilter: 'blur(10px)',
+          background: "rgba(34, 197, 94, 0.9)",
+          color: "white",
+          backdropFilter: "blur(10px)",
         },
       });
     } catch (error) {
       setState((prev) => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       }));
       toast.error("Failed to initialize application", {
         style: {
-          background: 'rgba(239, 68, 68, 0.9)',
-          color: 'white',
-          backdropFilter: 'blur(10px)',
+          background: "rgba(239, 68, 68, 0.9)",
+          color: "white",
+          backdropFilter: "blur(10px)",
         },
       });
     }
@@ -116,28 +120,28 @@ function App() {
 
     try {
       const result = await apiService.analyzeQuery(query, library);
-      
+
       setState((prev) => ({
         ...prev,
         isAnalyzing: false,
         analysisResult: result,
       }));
-      
+
       if (result.success) {
         addQuery(query, result);
         toast.success("✨ Analysis completed successfully!", {
           style: {
-            background: 'rgba(34, 197, 94, 0.9)',
-            color: 'white',
-            backdropFilter: 'blur(10px)',
+            background: "rgba(34, 197, 94, 0.9)",
+            color: "white",
+            backdropFilter: "blur(10px)",
           },
         });
       } else {
         toast.error(result.error || "Analysis failed", {
           style: {
-            background: 'rgba(239, 68, 68, 0.9)',
-            color: 'white',
-            backdropFilter: 'blur(10px)',
+            background: "rgba(239, 68, 68, 0.9)",
+            color: "white",
+            backdropFilter: "blur(10px)",
           },
         });
       }
@@ -149,16 +153,20 @@ function App() {
       }));
       toast.error("⚠️ Analysis failed", {
         style: {
-          background: 'rgba(239, 68, 68, 0.9)',
-          color: 'white',
-          backdropFilter: 'blur(10px)',
+          background: "rgba(239, 68, 68, 0.9)",
+          color: "white",
+          backdropFilter: "blur(10px)",
         },
       });
     }
   };
 
   const handleDownloadData = async () => {
-    if (!state.analysisResult?.processed_data || !Array.isArray(state.analysisResult.processed_data)) return;
+    if (
+      !state.analysisResult?.processed_data ||
+      !Array.isArray(state.analysisResult.processed_data)
+    )
+      return;
 
     try {
       const result = await apiService.downloadData(
@@ -175,12 +183,12 @@ function App() {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        
+
         toast.success("📊 Data exported successfully!", {
           style: {
-            background: 'rgba(34, 197, 94, 0.9)',
-            color: 'white',
-            backdropFilter: 'blur(10px)',
+            background: "rgba(34, 197, 94, 0.9)",
+            color: "white",
+            backdropFilter: "blur(10px)",
           },
         });
       }
@@ -188,9 +196,9 @@ function App() {
       console.error("Download failed:", error);
       toast.error("Download failed", {
         style: {
-          background: 'rgba(239, 68, 68, 0.9)',
-          color: 'white',
-          backdropFilter: 'blur(10px)',
+          background: "rgba(239, 68, 68, 0.9)",
+          color: "white",
+          backdropFilter: "blur(10px)",
         },
       });
     }
@@ -222,8 +230,14 @@ function App() {
             </p>
             <div className="mt-6 flex items-center justify-center space-x-2">
               <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-accent-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-              <div className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div
+                className="w-2 h-2 bg-accent-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0.1s" }}
+              ></div>
+              <div
+                className="w-2 h-2 bg-secondary-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0.2s" }}
+              ></div>
             </div>
           </motion.div>
         </div>
@@ -267,23 +281,24 @@ function App() {
 
   return (
     <div className="min-h-screen animated-bg">
-      <Toaster 
+      <ConnectionTest />
+      <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
           style: {
-            borderRadius: '12px',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: "12px",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
           },
         }}
       />
-      
-      <Navbar 
+
+      <Navbar
         onToggleHistory={() => setShowHistory(!showHistory)}
         onClearHistory={clearHistory}
         historyCount={history.length}
       />
-      
+
       <QueryHistory
         isOpen={showHistory}
         onClose={() => setShowHistory(false)}
@@ -306,7 +321,7 @@ function App() {
           >
             {/* Dataset Info */}
             {state.datasetInfo && (
-              <motion.div 
+              <motion.div
                 className="glass rounded-2xl shadow-2xl p-6 border border-white/20 backdrop-blur-xl"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -323,10 +338,26 @@ function App() {
                 </div>
                 <div className="space-y-4">
                   {[
-                    { label: "Total Rows", value: state.datasetInfo.rows, color: "from-blue-400 to-purple-500" },
-                    { label: "Columns", value: state.datasetInfo.columns, color: "from-green-400 to-blue-500" },
-                    { label: "Numeric Fields", value: state.datasetInfo.numeric_columns.length, color: "from-purple-400 to-pink-500" },
-                    { label: "Categories", value: state.datasetInfo.categorical_columns.length, color: "from-orange-400 to-red-500" },
+                    {
+                      label: "Total Rows",
+                      value: state.datasetInfo.rows,
+                      color: "from-blue-400 to-purple-500",
+                    },
+                    {
+                      label: "Columns",
+                      value: state.datasetInfo.columns,
+                      color: "from-green-400 to-blue-500",
+                    },
+                    {
+                      label: "Numeric Fields",
+                      value: state.datasetInfo.numeric_columns.length,
+                      color: "from-purple-400 to-pink-500",
+                    },
+                    {
+                      label: "Categories",
+                      value: state.datasetInfo.categorical_columns.length,
+                      color: "from-orange-400 to-red-500",
+                    },
                   ].map((item, index) => (
                     <motion.div
                       key={item.label}
@@ -430,10 +461,26 @@ function App() {
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[
-                          { label: "Chart Type", value: displayResult.analysis.chart, color: "from-blue-400 to-purple-500" },
-                          { label: "X-Axis", value: displayResult.analysis.x, color: "from-green-400 to-blue-500" },
-                          { label: "Y-Axis", value: displayResult.analysis.y || "N/A", color: "from-purple-400 to-pink-500" },
-                          { label: "Aggregation", value: displayResult.analysis.agg || "None", color: "from-orange-400 to-red-500" },
+                          {
+                            label: "Chart Type",
+                            value: displayResult.analysis.chart,
+                            color: "from-blue-400 to-purple-500",
+                          },
+                          {
+                            label: "X-Axis",
+                            value: displayResult.analysis.x,
+                            color: "from-green-400 to-blue-500",
+                          },
+                          {
+                            label: "Y-Axis",
+                            value: displayResult.analysis.y || "N/A",
+                            color: "from-purple-400 to-pink-500",
+                          },
+                          {
+                            label: "Aggregation",
+                            value: displayResult.analysis.agg || "None",
+                            color: "from-orange-400 to-red-500",
+                          },
                         ].map((spec, index) => (
                           <motion.div
                             key={spec.label}
@@ -475,7 +522,9 @@ function App() {
                     <AlertCircle className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <p className="text-white font-bold text-lg">Analysis Error</p>
+                    <p className="text-white font-bold text-lg">
+                      Analysis Error
+                    </p>
                     <p className="text-red-200">{state.error}</p>
                   </div>
                 </div>

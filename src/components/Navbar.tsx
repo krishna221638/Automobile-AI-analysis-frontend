@@ -1,7 +1,7 @@
-import React from 'react';
-import { Car, Moon, Sun, History, Trash2, Sparkles } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useTheme } from '../hooks/useTheme';
+import React from "react";
+import { Car, Moon, Sun, History, Trash2, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { useTheme } from "../hooks/useTheme";
 
 interface NavbarProps {
   onToggleHistory: () => void;
@@ -9,7 +9,11 @@ interface NavbarProps {
   historyCount: number;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onToggleHistory, onClearHistory, historyCount }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  onToggleHistory,
+  onClearHistory,
+  historyCount,
+}) => {
   const { isDark, toggleTheme } = useTheme();
 
   return (
@@ -18,9 +22,9 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleHistory, onClearHistory, histor
       animate={{ y: 0 }}
       className="glass sticky top-0 z-50 border-b border-white/20 backdrop-blur-xl"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl bg-black mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <motion.div 
+          <motion.div
             className="flex items-center space-x-3"
             whileHover={{ scale: 1.05 }}
           >
@@ -45,10 +49,14 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleHistory, onClearHistory, histor
             >
               <History className="h-5 w-5" />
               <span className="text-sm font-medium">History</span>
-              <motion.span 
+              <motion.span
                 className="bg-gradient-to-r from-accent-400 to-warning-400 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg"
                 animate={{ scale: historyCount > 0 ? [1, 1.1, 1] : 1 }}
-                transition={{ duration: 0.5, repeat: historyCount > 0 ? Infinity : 0, repeatDelay: 2 }}
+                transition={{
+                  duration: 0.5,
+                  repeat: historyCount > 0 ? Infinity : 0,
+                  repeatDelay: 2,
+                }}
               >
                 {historyCount}
               </motion.span>
@@ -73,13 +81,17 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleHistory, onClearHistory, histor
               whileHover={{ scale: 1.05, y: -2, rotate: 180 }}
               whileTap={{ scale: 0.95 }}
               className="p-2 rounded-xl bg-gradient-to-r from-warning-500/20 to-accent-500/20 text-white hover:from-warning-500/30 hover:to-accent-500/30 transition-all duration-300 backdrop-blur-sm border border-white/20 shadow-lg"
-              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               <motion.div
                 animate={{ rotate: isDark ? 0 : 180 }}
                 transition={{ duration: 0.5 }}
               >
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {isDark ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
               </motion.div>
             </motion.button>
           </div>

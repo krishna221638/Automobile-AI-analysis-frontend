@@ -28,9 +28,9 @@ const QueryInput: React.FC<QueryInputProps> = ({ onAnalyze, isAnalyzing }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-6">
       <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-        <Search className="h-5 w-5 mr-2" />
+        <Search className="h-5 w-5 mr-2 text-gray-700" />
         Natural Language Query
       </h2>
 
@@ -47,9 +47,10 @@ const QueryInput: React.FC<QueryInputProps> = ({ onAnalyze, isAnalyzing }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="e.g., show average price by brand"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-gray-900 placeholder-gray-500 bg-white shadow-inner transition-all duration-200"
             rows={3}
             disabled={isAnalyzing}
+            style={{ color: "#111827", backgroundColor: "#ffffffff" }}
           />
         </div>
 
@@ -66,7 +67,7 @@ const QueryInput: React.FC<QueryInputProps> = ({ onAnalyze, isAnalyzing }) => {
               onChange={(e) =>
                 setLibrary(e.target.value as "plotly" | "matplotlib")
               }
-              className="border border-gray-300 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="border border-gray-300 rounded px-3 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
               disabled={isAnalyzing}
             >
               <option value="plotly">Plotly</option>
@@ -94,9 +95,9 @@ const QueryInput: React.FC<QueryInputProps> = ({ onAnalyze, isAnalyzing }) => {
         </div>
       </form>
 
-      <div className="mt-4 text-sm text-gray-600">
-        <p className="font-medium mb-1">Example queries:</p>
-        <ul className="list-disc list-inside space-y-1 text-xs">
+      <div className="mt-4 text-sm text-gray-900">
+        <p className="font-medium mb-1 text-gray-900">Example queries:</p>
+        <ul className="list-disc list-inside space-y-1 text-xs text-gray-800">
           <li>"show average price by brand"</li>
           <li>"plot horsepower vs price"</li>
           <li>"display price distribution histogram"</li>

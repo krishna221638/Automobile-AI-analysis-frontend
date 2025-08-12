@@ -1,6 +1,28 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+// Configure axios with better error handling and timeout
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000, // 30 seconds timeout
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add response interceptor for better error handling
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error("API Error:", error);
+    if (error.code === "ECONNREFUSED") {
+      console.error("Backend server is not running or not accessible");
+    }
+    return Promise.reject(error);
+  }
+);
 
 export interface DatasetInfo {
   rows: number;
@@ -37,13 +59,7 @@ class ApiService {
   private axiosInstance;
 
   constructor() {
-    this.axiosInstance = axios.create({
-      baseURL: API_BASE_URL,
-      timeout: 30000,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    this.axiosInstance = axiosInstance;
   }
 
   async healthCheck(): Promise<{ status: string; message: string }> {

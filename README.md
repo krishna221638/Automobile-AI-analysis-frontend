@@ -1,177 +1,116 @@
-# Automobile Data Insights - Enhanced Frontend
+# Automobile Data Analysis Frontend
 
-A modern, responsive React frontend for analyzing automobile datasets using natural language queries powered by Mistral AI.
+This is the frontend application for the Automobile Data Analysis platform, powered by AI for natural language querying and data visualization.
 
 ## Features
 
-### 🎨 Modern UI/UX
-- **Dark/Light Mode**: Toggle between themes with persistent localStorage
-- **Responsive Design**: Optimized for desktop and mobile devices
-- **Smooth Animations**: Framer Motion animations and micro-interactions
-- **Loading States**: Skeleton loaders for better user experience
+- Natural language queries for automobile data analysis
+- AI-powered chart generation using Mistral AI
+- Interactive data visualizations
+- Modern, responsive user interface
+- Real-time data processing and visualization
 
-### 📊 Advanced Analytics
-- **Multiple Chart Types**: Support for bar, line, scatter, histogram, and pie charts
-- **Interactive Charts**: Built with Chart.js and react-chartjs-2
-- **Export Capabilities**: Download charts as PNG and data as CSV
-- **Real-time Analysis**: Natural language query processing
+## Development
 
-### 🔄 Query Management
-- **Query History**: Keep track of up to 10 recent queries
-- **Quick Examples**: Pre-built example queries for easy testing
-- **Tab-like Interface**: Switch between different analysis results
-- **Auto-fill**: Click examples to populate the input field
+**Local Development**o your Lovable project
 
-### 🛠 Technical Features
-- **TypeScript**: Full type safety throughout the application
-- **Modern React**: Functional components with hooks
-- **Modular Architecture**: Clean component separation
-- **Error Handling**: Comprehensive error states and toast notifications
-- **Environment Variables**: Configurable API endpoints
+## Project info
+
+**URL**: https://lovable.dev/projects/527735ed-6057-4d98-850a-0ae144a91f58
+
+## How can I edit this code?
+
+There are several ways of editing your application.
+
+**Use Lovable**
+
+To run the project locally:
+
+1. Clone this repository
+2. Install dependencies: `npm install`
+3. Start the development server: `npm run dev`
+4. Open your browser to `http://localhost:8080`
+
+Make sure the backend API server is running on `http://localhost:5000` for full functionality.
+
+## Technologies Used
+
+- React with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- Recharts for data visualization
+- Shadcn/ui for UI components
+
+## Build and Deploy
+
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+Follow these steps:
+
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
+
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
+
+# Step 3: Install the necessary dependencies.
+npm i
+
+# Step 4: Start the development server with auto-reloading and an instant preview.
+npm run dev
+```
+
+**Edit a file directly in GitHub**
+
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
+
+**Use GitHub Codespaces**
+
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
+
+## What technologies are used for this project?
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+
+## How can I deploy this project?
+
+To build for production:
+
+```bash
+npm run build
+```
+
+The built files will be in the `dist` directory.
 
 ## Project Structure
 
 ```
 src/
-├── components/
-│   ├── ChartDisplay.tsx          # Original chart display (Plotly)
-│   ├── ModernChartDisplay.tsx    # Enhanced chart display (Chart.js)
-│   ├── DatasetPreview.tsx        # Dataset preview table
-│   ├── ExampleQueries.tsx        # Sidebar example queries
-│   ├── LoadingSkeleton.tsx       # Loading state components
-│   ├── ModernQueryInput.tsx      # Enhanced query input
-│   ├── Navbar.tsx               # Top navigation bar
-│   ├── QueryHistory.tsx         # Query history sidebar
-│   └── QueryInput.tsx           # Original query input
-├── hooks/
-│   ├── useQueryHistory.ts       # Query history management
-│   └── useTheme.ts             # Theme management
-├── services/
-│   ├── api.ts                  # Original API service
-│   └── modernApi.ts            # Enhanced API service
-└── types/
-    └── react-plotly.d.ts       # Plotly type definitions
+├── components/     # React components
+├── hooks/         # Custom React hooks
+├── lib/           # Utility functions
+├── pages/         # Page components
+├── services/      # API services
+└── types/         # TypeScript type definitions
 ```
 
-## Installation & Setup
+## Can I connect a custom domain to my Lovable project?
 
-1. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+Yes, you can!
 
-2. **Environment Configuration**
-   Create a `.env` file in the root directory:
-   ```env
-   VITE_API_URL=http://localhost:5000/api
-   ```
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
-3. **Start Development Server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Build for Production**
-   ```bash
-   npm run build
-   ```
-
-## API Integration
-
-The frontend is designed to work with your existing backend API. It maintains backward compatibility while adding enhanced features:
-
-### Existing Endpoints (Maintained)
-- `GET /api/health` - Health check
-- `POST /api/initialize` - Initialize application
-- `GET /api/dataset-info` - Get dataset information
-- `POST /api/analyze` - Analyze natural language queries
-- `POST /api/download-data` - Download processed data
-- `GET /api/example-queries` - Get example queries
-
-### Expected Response Format
-```typescript
-interface AnalysisResult {
-  success: boolean;
-  analysis: {
-    chart: string;
-    x: string;
-    y?: string;
-    agg?: string;
-  };
-  chart_data: any; // Plotly format or base64 image
-  processed_data: any[];
-  summary: string;
-  data_points: number;
-  error?: string;
-}
-```
-
-## Usage
-
-### Basic Query Flow
-1. Enter a natural language query (e.g., "Show average price by brand")
-2. Select chart library (Plotly or Matplotlib)
-3. Click "Analyze" to process the query
-4. View results with interactive charts and data tables
-5. Export charts as PNG or data as CSV
-
-### Advanced Features
-- **Theme Toggle**: Click the moon/sun icon in the navbar
-- **Query History**: Click "History" to view and switch between past queries
-- **Quick Examples**: Use sidebar examples or click quick example buttons
-- **Export Options**: Download charts and data using the export buttons
-
-## Customization
-
-### Theming
-The application supports full dark/light mode theming. Customize colors in `tailwind.config.js`:
-
-```javascript
-theme: {
-  extend: {
-    colors: {
-      // Add custom colors here
-    }
-  }
-}
-```
-
-### Chart Styling
-Modify chart appearance in `ModernChartDisplay.tsx`:
-
-```typescript
-const chartOptions = {
-  // Customize chart options
-  plugins: {
-    legend: {
-      // Legend styling
-    }
-  }
-}
-```
-
-## Browser Support
-
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-
-## Performance
-
-- **Bundle Size**: Optimized with tree shaking
-- **Loading**: Skeleton loaders for perceived performance
-- **Animations**: Hardware-accelerated CSS animations
-- **Caching**: LocalStorage for theme and history persistence
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
